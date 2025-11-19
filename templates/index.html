@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Filler Machine Fault & Error Code Predictor</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script defer src="{{ url_for('static', filename='script.js') }}"></script>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card1">
+      <div class="card">
+         <div class="header-row">
+          <img src="{{ url_for('static', filename='logo.png') }}" class="logo" alt="logo">
+          <div class="title-group">
+            <div class="title">Filler Machine Fault & Error Code Predictor</div>
+            <div class="company">- Moon Beverage</div>
+          </div>
+          <div class="developer">
+            <div class="dev">Designed By</div>
+            <div class="college">- Student of EiilmJc</div>
+          </div>
+        </div>
+        <div class="main-panels">
+          <!-- LEFT PANEL -->
+          <div class="left">
+            <div class="panel-title">Enter Sensor Values</div>
+            <div class="field"><label>Temperature (°C)</label><input id="temp" type="number" placeholder="25–45" /></div>
+            <div class="field"><label>Pressure (bar)</label><input id="pressure" type="number" step="0.01" placeholder="3–5" /></div>
+            <div class="field"><label>Flow Rate (L/min)</label><input id="flow" type="number" placeholder="140–180" /></div>
+            <div class="field"><label>Vibration (mm/s)</label><input id="vibration" type="number" step="0.01" placeholder="0–1" /></div>
+            <div class="field"><label>Fill Height (mm)</label><input id="fillheight" type="number" placeholder="245–255" /></div>
+            <div class="field"><label>Power Consumption (kW)</label><input id="power" type="number" step="0.01" placeholder="3–5" /></div>
+            <div class="field"><label>CO₂ Level (ppm)</label><input id="co2" type="number" placeholder="380–450" /></div>
+            <div class="field"><label>Humidity (%)</label><input id="humidity" type="number" placeholder="45–60" /></div>
+            <button class="predict-btn" onclick="onPredict()">PREDICT</button>
+          </div>
+
+          <!-- RIGHT PANEL -->
+          <div class="right">
+            <div class="prob-card">
+              <div class="legend">
+                <h3>Error Probability -</h3>
+                <div class="legend-row"><span class="dot green"></span> Normal</div>
+                <div class="legend-row"><span class="dot yellow"></span> Low Chance</div>
+                <div class="legend-row"><span class="dot red"></span> High Chance of Error</div>
+              </div>
+              <div class="chart-holder">
+                <canvas id="donutChart"></canvas>
+                <div class="donut-center" id="donutCenter"></div>
+              </div>
+            </div>
+
+            <div class="error-box">
+              <div class="error-title"><span>Error Code -</span><div class="err-code" id="errCode">E000</div></div>
+              <div class="err-desc-title">Error Description -</div>
+              <div class="description" id="errDesc">No fault detected - normal.</div>
+            </div>
+
+            <div class="contrib">
+              <h4>Parameter Contribution</h4>
+              <canvas id="barChart" height="150"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="log-chart-box">
+            <h2>Last 20 Prediction Logs</h2>
+            <canvas id="logsChart" height="140"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

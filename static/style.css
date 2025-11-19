@@ -1,0 +1,287 @@
+/* Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700;800&display=swap');
+
+:root{
+  --brand-red: #d91d21;
+  --deep-blue: #0b3b86;
+  --panel-bg: #f3f5f7;
+  --card-bg: #ffffff;
+  --muted: #6b6b6b;
+  --shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+
+*{ box-sizing: border-box; }
+
+body{
+  font-family: 'Poppins',sans-serif;
+  background: var(--panel-bg);
+  margin: 0;
+}
+
+/* Layout */
+.wrap{ max-width:1200px; margin:18px auto; padding:0 12px; }
+.card1{ width:100%; }
+.card{
+  background: var(--card-bg);
+  border-radius:14px;
+  box-shadow: var(--shadow);
+  display:flex;
+  flex-direction: column;
+  gap:18px;
+}
+
+/* HEADER ROW */
+.header-row {
+  height: 100px;
+  width: 100%;
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  background:#dd0f0f;
+  padding:0;           
+  margin:0;
+  border-radius:10px 10px 0 0;   /* Top rounded only */
+  border-bottom-left-radius:0;
+  border-bottom-right-radius:0;
+}
+
+.header-row .logo{ height:90px; margin-left:10px; }
+
+.title-group{
+  display:flex;
+  flex-direction:column;
+  text-align:left;
+}
+
+.title{
+  font-size:28px;
+  font-weight:800;
+  color:#FFF599;
+}
+
+.company{
+  font-size:20px;
+  color:#ffffff;
+  font-weight:bold;
+  line-height:18px;
+}
+
+.developer{
+  display:flex;
+  flex-direction:column;
+  background:#131166;
+  padding:8px 12px;
+  border-radius:10px;
+  margin-right:10px;
+}
+
+.dev, .college{
+  font-size:14px;
+  font-weight:bold;
+  color:#c0ffff;
+}
+
+/* Panels container */
+.main-panels{
+  display:flex;
+  gap:20px;
+  width:100%;
+}
+
+/* LEFT PANEL */
+.left{
+  flex:0.85;
+  padding:18px;
+  background:#f7f8f9;
+  border-radius:10px;
+  display:flex;
+  flex-direction:column;
+  margin-left:18px;
+}
+
+.panel-title{
+  font-size:22px;
+  font-weight:800;
+  margin-bottom:10px;
+  color:#0b3b86;
+}
+
+.field{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:15px 6px;
+}
+
+.field label{
+  font-size:17px;
+  font-weight:600;
+  margin-right:10px;
+}
+
+.field input{
+  width:160px;
+  padding:10px;
+  border:1px solid #ccc;
+  border-radius:5px;
+}
+
+/* Predict Button */
+.predict-btn{
+  margin-top:auto;
+  padding:14px;
+  width:100%;
+  background:var(--brand-red);
+  color:#fff;
+  border:none;
+  border-radius:10px;
+  font-size:18px;
+  font-weight:800;
+  cursor:pointer;
+  box-shadow:0 8px 20px rgba(217,29,33,0.14);
+}
+
+/* RIGHT PANEL */
+.right{
+  flex:1.2;
+  padding:18px;
+  background:#f7f8f9;
+  border-radius:10px;
+  margin-right:18px;
+  display:flex;
+  flex-direction:column;
+}
+
+/* Probability card */
+.prob-card{
+  background:white;
+  border-radius:10px;
+  padding:14px;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  margin-bottom:12px;
+  box-shadow:0 6px 14px rgba(0,0,0,0.06);
+}
+
+.legend-row{ display:flex; gap:8px; margin-top:6px; }
+.dot{ width:12px; height:12px; border-radius:50%; }
+.dot.green{ background:#29c37a; }
+.dot.yellow{ background:#ffd24a; }
+.dot.red{ background:#e63946; }
+
+.chart-holder{
+  position:relative;
+  width:130px;
+  height:130px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.donut-center{
+  position:absolute;
+  font-weight:800;
+  color:#0b3b86;
+  font-size:30px;
+}
+
+/* Error box */
+.error-box{
+  background:white;
+  padding:12px;
+  border-radius:10px;
+  box-shadow:var(--shadow);
+  margin-bottom:12px;
+}
+
+/* Contribution */
+.contrib{
+  background:white;
+  border-radius:10px;
+  padding:12px;
+  margin-top:auto;
+  box-shadow:var(--shadow);
+}
+
+.log-chart-box{
+  background:white;
+  padding:18px;
+  border-radius:10px;
+  margin:18px;
+  margin-top:0;
+  box-shadow:var(--shadow);
+}
+
+/* ---------------------------------------------------------
+   📱 MOBILE RESPONSIVE (VERY IMPORTANT) 
+----------------------------------------------------------*/
+@media (max-width: 900px){
+
+  .header-row{
+    flex-direction:column;
+    height:auto;
+    padding:10px;
+    text-align:center;
+  }
+
+  .header-row .logo{ height:70px; margin:0; }
+
+  .title{ font-size:22px; }
+  .company{ margin:0; font-size:16px; }
+
+  .developer{ margin-top:8px; }
+
+  .main-panels{
+    flex-direction:column;
+    margin:0 10px;
+  }
+
+  .left, .right{
+    margin-left:0;
+    margin-right:0;
+    width:100%;
+  }
+
+  .field{
+    flex-direction:column;
+    align-items:flex-start;
+    gap:6px;
+  }
+
+  .field input{
+    width:100%;
+  }
+
+  .predict-btn{
+    font-size:16px;
+  }
+
+  /* Charts center on mobile */
+  .prob-card{
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+  }
+
+  .chart-holder{
+    margin:0;
+    width:150px;
+    height:150px;
+  }
+
+  .donut-center{
+    font-size:22px;
+  }
+}
+
+/* Small phones < 480px */
+@media (max-width:480px){
+  .title{ font-size:18px; }
+  .company{ font-size:14px; }
+
+  .donut-center{ font-size:20px; }
+  .chart-holder{ width:120px; height:120px; }
+
+  .field label{ font-size:15px; }
+}
