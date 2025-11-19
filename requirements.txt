@@ -1,10 +1,9 @@
 flask
-gunicorn
-numpy
+joblib
 pandas
+numpy
 scikit-learn
 shap
-joblib
-datetime
-csv
-os
+matplotlib
+numba
+cloudpickle
