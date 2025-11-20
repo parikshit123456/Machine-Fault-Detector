@@ -27,15 +27,15 @@ features = [
 
 # Error descriptions
 error_descriptions = {
-    "E000": "Normal",
-    "E001": "Over Temperature",
-    "E002": "High Pressure",
-    "E003": "Flow Rate Out of Range",
-    "E004": "High Vibration",
-    "E005": "Fill Height Abnormal",
-    "E006": "Power Consumption Abnormal",
-    "E007": "CO2 Out of Range",
-    "E008": "Humidity Out of Range"
+    "E000": "No fault detected — all system parameters are within the normal operating range.",
+    "E001": "Over Temperature Detected — the temperature has exceeded the acceptable threshold, indicating possible cooling failure or excessive load.",
+    "E002": "High Pressure Condition — the system pressure is above the safe limit, which may indicate blockage, pump malfunction, or valve issues.",
+    "E003": "Flow Rate Out of Range — the flow value is either too low or too high, suggesting possible leakage, clogging, or pump irregularities.",
+    "E004": "High Vibration Detected — abnormal vibrations were recorded, which may signal imbalance, bearing wear, or mechanical component misalignment.",
+    "E005": "Fill Height Abnormal — the container level is outside the expected range, possibly due to sensor error, leakage, or improper filling.",
+    "E006": "Power Consumption Abnormal — the energy usage is inconsistent with normal operation, indicating overload, electrical issues, or equipment deterioration.",
+    "E007": "CO2 Level Out of Range — carbon dioxide concentration has deviated from the standard range, potentially affecting product quality or safety.",
+    "E008": "Humidity Out of Range — humidity levels are abnormal, which may cause condensation, corrosion, or impact on product stability."
 }
 
 app = Flask(__name__)
@@ -180,3 +180,4 @@ def logs():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
