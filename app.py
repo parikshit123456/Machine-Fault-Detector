@@ -27,24 +27,53 @@ features = [
 
 # Error descriptions
 error_descriptions = {
-    "E000": "No fault detected — all parameters are within normal range.",
-    "E001": "Over Temperature — system temperature has exceeded the safe limit.",
-    "E002": "High Pressure — pressure is above the safe operating range.",
-    "E003": "Flow Rate Out of Range — flow is too low or too high.",
-    "E004": "High Vibration — abnormal vibration detected, possible mechanical issue.",
-    "E005": "Fill Height Abnormal — container level is outside the expected range.",
-    "E006": "Power Consumption Abnormal — energy usage is not within normal limits.",
-    "E007": "CO2 Out of Range — CO2 concentration is above or below normal.",
-    "E008": "Humidity Out of Range — humidity level is outside the safe range."
+    "E000": "Normal",
+    "E001": "Over Temperature",
+    "E002": "High Pressure",
+    "E003": "Flow Rate Out of Range",
+    "E004": "High Vibration",
+    "E005": "Fill Height Abnormal",
+    "E006": "Power Consumption Abnormal",
+    "E007": "CO2 Out of Range",
+    "E008": "Humidity Out of Range"
 }
 
 app = Flask(__name__)
 
-# Load SHAP explainer
+# Load SHAP Explainer
 try:
     shap_explainer = shap.TreeExplainer(binary_model)
 except:
     shap_explainer = shap.Explainer(binary_model)
+
+
+# ----------------------------------------------------------
+# ✅ LOAD LAST 20 LOGS FROM CSV ON STARTUP
+# ----------------------------------------------------------
+def load_csv_logs():
+    if not os.path.exists(CSV_FILE):
+        return
+
+    df = pd.read_csv(CSV_FILE)
+
+    # Ensure compatible columns
+    required = ["timestamp", "probability", "error_code", "error_description"]
+    for r in required:
+        if r not in df.columns:
+            df[r] = ""
+
+    last_logs = df.tail(MAX_LOGS)
+
+    for _, row in last_logs.iterrows():
+        prediction_logs.append({
+            "timestamp": row["timestamp"],
+            "probability": float(row["probability"]),
+            "error_code": row["error_code"],
+            "error_description": row["error_description"]
+        })
+
+
+load_csv_logs()
 
 
 @app.route("/")
@@ -57,17 +86,14 @@ def predict():
     try:
         data = request.json or {}
 
-        # Safe float conversion
         def safe_float(val):
             if isinstance(val, list) and len(val) > 0:
                 val = val[0]
             return float(val)
 
-        # Input order expected by model
         input_keys = ["temp", "pressure", "flow", "vibration",
                       "fillheight", "power", "co2", "humidity"]
 
-        # Extract sensor inputs
         input_values = []
         for key in input_keys:
             try:
@@ -76,94 +102,75 @@ def predict():
                 value = 0
             input_values.append(value)
 
-        # Create dataframe
         df = pd.DataFrame([input_values], columns=features)
 
-        # === BINARY PREDICTION ===
+        # BINARY
         binary_prob = float(binary_model.predict_proba(df)[0][1])
         binary_pred = int(binary_model.predict(df)[0])
 
-        # === MULTICLASS PREDICTION ===
+        # MULTICLASS
         multi_raw = int(multi_model.predict(df)[0])
         error_code = encoder.inverse_transform([multi_raw])[0]
 
-        # Force to normal if probability very low
         if binary_prob < 0.05:
             error_code = "E000"
 
-        # === SHAP CONTRIBUTIONS ===
+        # SHAP
         try:
             shap_values = shap_explainer.shap_values(df)
             shap_values = np.array(shap_values)
-
-            # If SHAP returns (1, n_features, 2) take class 1
             if shap_values.ndim == 3 and shap_values.shape[2] == 2:
                 shap_values = shap_values[:, :, 1]
 
-            shap_flat = shap_values.ravel()
-
-            contributions = {
-                features[i]: float(shap_flat[i]) for i in range(len(features))
-            }
-
-        except Exception as e:
-            print("SHAP error:", e)
+            contributions = {features[i]: float(shap_values.ravel()[i]) for i in range(len(features))}
+        except:
             contributions = {f: 0 for f in features}
 
-        # === SAVE TO IN-MEMORY LOGS ===
+        short_desc = error_descriptions.get(error_code, "Normal")
+
+        # ----------- SAVE IN MEMORY ----------
         log_entry = {
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "probability": round(binary_prob, 4),
-            "error_code": error_code
+            "error_code": error_code,
+            "error_description": short_desc
         }
 
         prediction_logs.append(log_entry)
         if len(prediction_logs) > MAX_LOGS:
             prediction_logs.pop(0)
 
-        # === SAVE TO CSV FILE ===
-        csv_headers = [
-            "timestamp", "probability", "error_code",
-            "Temperature", "Pressure", "FlowRate",
-            "Vibration", "FillHeight", "Power",
-            "CO2", "Humidity"
-        ]
-
+        # ----------- SAVE TO CSV -------------
         file_exists = os.path.isfile(CSV_FILE)
 
         with open(CSV_FILE, "a", newline="") as f:
             writer = csv.writer(f)
 
             if not file_exists:
-                writer.writerow(csv_headers)
+                writer.writerow([
+                    "timestamp", "probability", "error_code", "error_description",
+                    "Temperature", "Pressure", "FlowRate",
+                    "Vibration", "FillHeight", "Power", "CO2", "Humidity"
+                ])
 
             writer.writerow([
                 log_entry["timestamp"],
                 log_entry["probability"],
                 error_code,
-                input_values[0], input_values[1], input_values[2],
-                input_values[3], input_values[4], input_values[5],
-                input_values[6], input_values[7]
+                short_desc,
+                *input_values
             ])
 
-        # === RESPONSE ===
         return jsonify({
             "binary": binary_pred,
             "probability": round(binary_prob, 4),
             "error_code": error_code,
-            "error_description": error_descriptions.get(error_code, "No fault detected."),
+            "error_description": short_desc,
             "contributions": contributions
         })
 
     except Exception as e:
-        return jsonify({
-            "binary": 0,
-            "probability": 0,
-            "error_code": "E000",
-            "error_description": "No fault detected - normal.",
-            "contributions": {},
-            "error": str(e)
-        }), 500
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route("/logs")
