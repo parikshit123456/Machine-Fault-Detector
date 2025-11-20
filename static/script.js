@@ -22,8 +22,9 @@ let logsChart;
 // ------------------------------
 window.addEventListener("load", () => {
 
-  // LOGS LINE CHART
-  const logsCtx = document.getElementById("logsChart").getContext("2d");
+ // LOGS LINE CHART
+const logsCtx = document.getElementById("logsChart").getContext("2d");
+
 logsChart = new Chart(logsCtx, {
   type: "line",
   data: {
@@ -34,17 +35,46 @@ logsChart = new Chart(logsCtx, {
       borderWidth: 3,
       borderColor: "#0ee2d8ff",
       tension: 0.3,
-      fill: false
+      fill: false,
+
+      // store custom values inside dataset
+      errorCodes: [],
+      descriptions: []
     }]
   },
   options: {
     responsive: true,
+    interaction: {
+      mode: "nearest",
+      intersect: false
+    },
+    plugins: {
+      tooltip: {
+        enabled: true,
+        callbacks: {
+          label: function(context) {
+            const idx = context.dataIndex;
+
+            const prob = context.dataset.data[idx];
+            const err = context.dataset.errorCodes[idx];
+            const desc = context.dataset.descriptions[idx];
+
+            return [
+              "Probability: " + prob + "%",
+              "Error: " + err,
+              "Desc: " + desc
+            ];
+          },
+          title: function(context) {
+            return "Time: " + context[0].label;
+          }
+        }
+      }
+    },
     scales: {
-      y: { 
+      y: {
         beginAtZero: true,
         max: 100,
-
-        // ⭐ ADD THIS FOR Y-AXIS LABEL ⭐
         title: {
           display: true,
           text: "Error Probability (%)",
@@ -97,7 +127,7 @@ logsChart = new Chart(logsCtx, {
     },
     options: {
       responsive: true,
-      plugins: { legend: { display: false }},
+      plugins: { legend: { display: false } },
       scales: { y: { beginAtZero: true } }
     }
   });
@@ -120,7 +150,7 @@ function setDonutCenter(text) {
 // ------------------------------
 async function onPredict() {
 
-  const ids = ['temp','pressure','flow','vibration','fillheight','power','co2','humidity'];
+  const ids = ['temp', 'pressure', 'flow', 'vibration', 'fillheight', 'power', 'co2', 'humidity'];
 
   let allFilled = true;
 
@@ -208,6 +238,10 @@ async function loadLogsChart() {
 
     logsChart.data.labels = logs.map(l => l.timestamp);
     logsChart.data.datasets[0].data = logs.map(l => Math.round(l.probability * 100));
+
+    // custom arrays for tooltip
+    logsChart.data.datasets[0].errorCodes = logs.map(l => l.error_code);
+    logsChart.data.datasets[0].descriptions = logs.map(l => l.error_description);
 
     logsChart.update();
 
